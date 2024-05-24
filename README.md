@@ -21,7 +21,7 @@ python main.py \
   -g api \
   -b 1 \
   -f prompts/prompt.md \
-  --api_url "http://209.20.159.234:5000/generate" \
+  --api_url "YOUR_API_URL" \
   --api_type "vllm" \
   -p 20 \
   -c 0 \
