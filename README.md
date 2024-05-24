@@ -17,7 +17,7 @@ Run sql-eval using the vLLM API runner, and with the `--logprobs` command line p
 python main.py \            
   -db postgres \
   -q "data/questions_gen_postgres.csv" "data/instruct_basic_postgres.csv" "data/instruct_advanced_postgres.csv" \
-  -o results/api_bs32_exp.csv results/api_basic_bs32_exp.csv results/api_advanced_bs32_exp.csv \
+  -o results/classic.csv results/basic.csv results/advanced.csv \
   -g api \
   -b 1 \
   -f prompts/prompt.md \
