@@ -30,6 +30,6 @@ python main.py \
 
 ## TODO
 
-- [ ] Let users run execute SQL with a single click, and see results
+- [ ] Let users execute the SQL queries they see with a single click, and see the resulting tables
 - [ ] Compare the results of 2 different runs, instead of just looking at results from a single run
 - [ ] Let users manually mark some squares as "almost correct", or "partially correct" in the UI, in order to differentiate responses that are _almost_ correct with those that are very off
