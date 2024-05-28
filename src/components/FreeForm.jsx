@@ -30,7 +30,11 @@ const FreeForm = ({
   }
 
   return (
-    <div className='flex'>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    }}>
       <div id="freeform-input">
         <h3>URL</h3>
         <input
