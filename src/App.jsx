@@ -6,6 +6,7 @@ import './App.css';
 function App() {
   const [dataset, setDataset] = useState("classic_new");
   const [searchPattern, setSearchPattern] = useState(null);
+  const [maxConfidence, setMaxConfidence] = useState(1);
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState([]);
   const [siderVisible, setSiderVisible] = useState(false);
@@ -19,6 +20,15 @@ function App() {
 
     if (searchPattern) {
       data = data.filter((item) => item.question.toLowerCase().includes(searchPattern) || item.generated_query.toLowerCase().includes(searchPattern));
+    }
+
+    if (maxConfidence) {
+      // check if the min of all rank_1_probs is less than maxConfidence
+      data = data.filter((item) => {
+        return item.logprobs.reduce((acc, item) => {
+          return Math.min(acc, item.rank_1_prob);
+        }, 1) <= maxConfidence;
+      });
     }
 
     const cats = [];
@@ -53,17 +63,12 @@ function App() {
 
   useEffect(() => {
     getData(dataset);
-  }, [dataset, searchPattern]);
+  }, [dataset, searchPattern, maxConfidence]);
 
   return (
     <div className="App">
       <h1>Eval Visualizer</h1>
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 10,
-      }}>
+      <div className="flex flex-padded">
         <div id="options">
           <h3>Eval Type</h3>
           <select
@@ -89,16 +94,36 @@ function App() {
             style={{ width: 200 }}
             value={searchPattern}
             onChange={(ev) => {
-              setSearchPattern(ev.target.value);
+              setSearchPattern(ev.target.value.toLowerCase());
             }}
           />
+        </div>
+
+        <div id="slider-confidence">
+          <h3>Min Top Prob Threshold</h3>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={maxConfidence}
+            style={{ width: 200 }}
+            onChange={(ev) => {
+              setMaxConfidence(parseFloat(ev.target.value));
+            }}
+          />
+          <span>{maxConfidence}</span>
         </div>
       </div>
       
       <div id="summary-statistics">
         <h3>Summary Statistics</h3>
-        <p>Number of records: {data.length}</p>
-        <p>Total Correct: {data.filter((item) => item.correct === 1).length} ({100*(data.filter((item) => item.correct === 1).length/data.length)})%</p>
+        <div className="flex flex-padded">
+          <p><b>Number of records</b>: {data.length}</p>
+          <p><b>Total Correct</b>: {data.filter((item) => item.correct === 1).length} ({100*(data.filter((item) => item.correct === 1).length/data.length).toFixed(3)})%</p>
+          <p><b>Total Incorrect</b>: {data.filter((item) => item.correct === 0).length} ({100*(data.filter((item) => item.correct === 0).length/data.length).toFixed(3)})%</p>
+        </div>
+        
       </div>
       <div id="charts">
         {categories.map((category) => {
@@ -114,12 +139,7 @@ function App() {
               </h4>
               <div
                 key={category}
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  width: "100%",
-                  maxWidth: 600,
-                }}
+                className="flex"
               >
                 {data.filter((item) => item.query_category === category)
                 .sort((item) => item.correct === 1 ? -1 : 1)
