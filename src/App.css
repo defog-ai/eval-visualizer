@@ -2,6 +2,17 @@
   padding: 20px;
 }
 
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 800px;
+}
+
+.flex > div, .flex > p {
+  padding-left: 1em;
+}
+
 .cell {
   width: 50px;
   height: 50px;
@@ -62,7 +73,7 @@ pre {
   position: absolute;
   right: 0;
   top: 0;
-  transition: .4s;
+  /* transition: .4s; */
 }
 
 .slider:before {
@@ -72,7 +83,7 @@ pre {
   height: 26px;
   left: 4px;
   position: absolute;
-  transition: .4s;
+  /* transition: .4s; */
   width: 26px;
 }
 
