@@ -6,6 +6,7 @@ import FreeForm from './components/FreeForm';
 import './App.css';
 
 function App() {
+
   const getBackgroundColor = (prob) => {
     return chroma.scale(['pink', 'yellow', 'lightgreen']).domain([0.15, 0.3, 1])(prob).hex();
   }
@@ -31,6 +32,7 @@ function App() {
       return sql;
     }
   }
+
 
   const [view, setView] = useState('single');
 
