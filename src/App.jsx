@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import chroma from "chroma-js";
 import { format } from 'sql-formatter';
 import EvalVisualizerSingle from './components/EvalVisualizerSingle';
+import FreeForm from './components/FreeForm';
 import './App.css';
 
 function App() {
@@ -10,13 +11,19 @@ function App() {
   }
 
   const formatSql = (sql) => {
+    console.log(sql);
+    // if sql is empty, undefined, or null, return empty string
     if (!sql) {
       return '';
     }
 
     // remove all curly braces
-    sql = sql.replace(/{/g, '');
-    sql = sql.replace(/}/g, '');
+    try {
+      sql = sql.replace(/{/g, '');
+      sql = sql.replace(/}/g, '');
+    } catch (e) {
+      return sql;
+    }
     
     try {
       return format(sql, { language: 'postgresql' });
@@ -25,12 +32,32 @@ function App() {
     }
   }
 
+  const [view, setView] = useState('single');
+
   return (
     <div className="App">
-      <EvalVisualizerSingle
-        getBackgroundColor={getBackgroundColor}
-        formatSql={formatSql}
-      />
+      <h2>Welcome to eval visualizer. What would you like to do?</h2>
+      <select
+        value={view}
+        onChange={(ev) => {
+          setView(ev.target.value);
+        }}
+      >
+        <option value="single">View a standalone eval</option>
+        <option value="compare">Compare two evals</option>
+        <option value="freeform">Ask a question and see logprobs</option>
+      </select>
+      {
+        view === 'single' ?
+        <EvalVisualizerSingle
+          getBackgroundColor={getBackgroundColor}
+          formatSql={formatSql}
+        /> :
+        <FreeForm
+          getBackgroundColor={getBackgroundColor}
+          formatSql={formatSql}
+        />
+      }
     </div>
   );
 }

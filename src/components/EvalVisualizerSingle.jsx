@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import LogProbsVisualizer from './LogProbsVisualizer';
 
 const EvalVisualizerSingle = ({
   getBackgroundColor,
@@ -13,8 +14,7 @@ const EvalVisualizerSingle = ({
   const [siderVisible, setSiderVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showProbs, setShowProbs] = useState(false);
-  const [selectedToken, setSelectedToken] = useState(null);
-
+  
   const getData = async () => {
     const response = await fetch(`/${dataset}.json`);
     let data = await response.json()
@@ -48,8 +48,7 @@ const EvalVisualizerSingle = ({
 
   return (
     <div>
-      <h1>Eval Visualizer</h1>
-      <div className="flex flex-padded">
+      <div className="flex">
         <div id="options">
           <h3>Eval Type</h3>
           <select
@@ -99,7 +98,7 @@ const EvalVisualizerSingle = ({
       
       <div id="summary-statistics">
         <h3>Summary Statistics</h3>
-        <div className="flex flex-padded">
+        <div className="flex">
           <p><b>Number of records</b>: {data.length}</p>
           <p><b>Total Correct</b>: {data.filter((item) => item.correct === 1).length} ({100*(data.filter((item) => item.correct === 1).length/data.length).toFixed(3)})%</p>
           <p><b>Total Incorrect</b>: {data.filter((item) => item.correct === 0).length} ({100*(data.filter((item) => item.correct === 0).length/data.length).toFixed(3)})%</p>
@@ -206,72 +205,11 @@ const EvalVisualizerSingle = ({
         <p>Generated Query:</p>
         {
           showProbs ?
-          <div>
-            <div style={{
-              width: "80%",
-              paddingBottom: 200
-            }}>
-            {(selectedItem?.logprobs || []).map(
-              (item, idx) => {
-                return (
-                  <span
-                    key={idx}
-                    style={{
-                      backgroundColor: getBackgroundColor(item?.rank_1_prob),
-                      padding: 1,
-                      margin: 1,
-                      borderRadius: 3,
-                      // hover pointer
-                      cursor: "pointer",
-                    }}
-                    // on hover, show the query in a floating div
-                    onMouseEnter={(ev) => {
-                      setSelectedToken(item);
-                      const floatingDiv = document.getElementById("floating-div");
-                      floatingDiv.style.visibility = "visible";
-                      floatingDiv.style.top = ev.clientY + 10 + "px";
-                      floatingDiv.style.left = ev.clientX + "px";
-                    }}
-                    onMouseLeave={() => {
-                      const floatingDiv = document.getElementById("floating-div");
-                      floatingDiv.style.visibility = "hidden";
-                    }}
-                  >
-                    {item['rank_1_token']}
-                  </span>
-                );
-              }
-            )}
-            {/* floating div */}
-            <div
-              id="floating-div"
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: 250,
-                height: 250,
-                backgroundColor: "white",
-                border: "1px solid black",
-                zIndex: 1000,
-                visibility: "hidden",
-              }}
-            >
-              <div>Top token: <code>{selectedToken?.rank_1_token}</code></div>
-              <div>Probability of top token: {selectedToken?.rank_1_prob.toFixed(2)}</div>
-              <div>Second token: <code>{selectedToken?.rank_2_token}</code></div>
-              <div>Probability of second token: {selectedToken?.rank_2_prob.toFixed(2)}</div>
-              <div
-                style={{
-                  backgroundColor: getBackgroundColor(selectedToken?.rank_1_prob - selectedToken?.rank_2_prob),
-                  padding: 1,
-                  margin: 1,
-                  borderRadius: 3,
-                }}
-              >Probability difference: {(selectedToken?.rank_1_prob - selectedToken?.rank_2_prob).toFixed(2)}</div>
-            </div>
-          </div>
-          </div> :
+          <LogProbsVisualizer
+            selectedItem={selectedItem}
+            getBackgroundColor={getBackgroundColor}
+          />
+          :
           <pre>{formatSql(selectedItem?.generated_query)}</pre>
         }
         {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
