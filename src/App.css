@@ -91,3 +91,36 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.3em 0.6em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: lightblue;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+select, input {
+  border-radius: 8px;
+  border: 1px solid black;
+  padding: 0.3em 0.6em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: white;
+}
+
+select {
+  cursor: pointer;
+}
