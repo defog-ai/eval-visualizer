@@ -4,7 +4,8 @@ import { format } from 'sql-formatter';
 import './App.css';
 
 function App() {
-  const [dataset, setDataset] = useState("classic"); // ["classic", "basic", "advanced"
+  const [dataset, setDataset] = useState("classic_new");
+  const [searchPattern, setSearchPattern] = useState(null);
   const [categories, setCategories] = useState([]);
   const [data, setData] = useState([]);
   const [siderVisible, setSiderVisible] = useState(false);
@@ -14,8 +15,12 @@ function App() {
 
   const getData = async () => {
     const response = await fetch(`/${dataset}.json`);
-    const data = await response.json();
-    
+    let data = await response.json()
+
+    if (searchPattern) {
+      data = data.filter((item) => item.question.toLowerCase().includes(searchPattern) || item.generated_query.toLowerCase().includes(searchPattern));
+    }
+
     const cats = [];
     data.forEach((item) => {
       if (!cats.includes(item.query_category)) {
@@ -48,27 +53,48 @@ function App() {
 
   useEffect(() => {
     getData(dataset);
-  }, [dataset]);
+  }, [dataset, searchPattern]);
 
   return (
     <div className="App">
-      <div id="options">
-        <h3>Choose filters to look at the data</h3>
-        <select
-          defaultValue="api_bs32_exp"
-          style={{ width: 120 }}
-          value={dataset}
-          onChange={
-            (ev) => {
-              setDataset(ev.target.value);
+      <h1>Eval Visualizer</h1>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: 10,
+      }}>
+        <div id="options">
+          <h3>Eval Type</h3>
+          <select
+            style={{ width: 120 }}
+            value={dataset}
+            onChange={
+              (ev) => {
+                setDataset(ev.target.value);
+              }
             }
-          }
-        >
-          <option value="classic">v1</option>
-          <option value="basic">Basic</option>
-          <option value="advanced">Advanced</option>
-        </select>
+          >
+            <option value="classic_new">v1</option>
+            <option value="basic_new">Basic</option>
+            <option value="advanced_new">Advanced</option>
+          </select>
+        </div>
+
+        <div id="search">
+          <h3>Question or SQL Pattern</h3>
+          <input
+            type="text"
+            placeholder="Pattern..."
+            style={{ width: 200 }}
+            value={searchPattern}
+            onChange={(ev) => {
+              setSearchPattern(ev.target.value);
+            }}
+          />
+        </div>
       </div>
+      
       <div id="summary-statistics">
         <h3>Summary Statistics</h3>
         <p>Number of records: {data.length}</p>
