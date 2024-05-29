@@ -7,7 +7,7 @@ const EvalVisualizerSingle = ({
   formatSql,
 }) => {
 
-  const [dataset, setDataset] = useState("classic_new");
+  const [dataset, setDataset] = useState("");
   const [searchPattern, setSearchPattern] = useState(null);
   const [maxConfidence, setMaxConfidence] = useState(1);
   const [categories, setCategories] = useState([]);
@@ -15,9 +15,10 @@ const EvalVisualizerSingle = ({
   const [siderVisible, setSiderVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showProbs, setShowProbs] = useState(false);
+  const [availableFiles, setAvailableFiles] = useState([]);
   
   const getData = async () => {
-    const response = await fetch(`/${dataset}.json`);
+    const response = await fetch(`/${dataset}`);
     let data = await response.json()
 
     if (searchPattern) {
@@ -27,7 +28,7 @@ const EvalVisualizerSingle = ({
     if (maxConfidence) {
       // check if the min of all rank_1_probs is less than maxConfidence
       data = data.filter((item) => {
-        return item.logprobs.reduce((acc, item) => {
+        return item?.logprobs.reduce((acc, item) => {
           return Math.min(acc, item.rank_1_prob);
         }, 1) <= maxConfidence;
       });
@@ -43,6 +44,18 @@ const EvalVisualizerSingle = ({
     setCategories(cats);
   }
 
+  const getFiles = async () => {
+    const response = await fetch(`/fnames.json`);
+    const files = await response.json();
+    console.log(files);
+    setAvailableFiles(files);
+    setDataset(files[0]);
+  }
+
+  useEffect(() => {
+    getFiles();
+  }, []);
+
   useEffect(() => {
     getData(dataset);
   }, [dataset, searchPattern, maxConfidence]);
@@ -53,7 +66,7 @@ const EvalVisualizerSingle = ({
         <div id="options">
           <h3>Eval Type</h3>
           <select
-            style={{ width: 120 }}
+            style={{ width: 240 }}
             value={dataset}
             onChange={
               (ev) => {
@@ -61,10 +74,11 @@ const EvalVisualizerSingle = ({
               }
             }
           >
-            <option value="classic_new">v1</option>
-            <option value="basic_new">Basic</option>
-            <option value="advanced_new">Advanced</option>
-            <option value="idk">IDK</option>
+            {availableFiles.map((file) => {
+              return (
+                <option key={file} value={file}>{file}</option>
+              );
+            })}
           </select>
         </div>
 
