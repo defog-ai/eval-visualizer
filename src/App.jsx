@@ -53,7 +53,23 @@ function App() {
         <EvalVisualizerSingle
           getBackgroundColor={getBackgroundColor}
           formatSql={formatSql}
-        /> :
+        /> : view === 'compare' ?
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}>
+          <EvalVisualizerSingle
+            getBackgroundColor={getBackgroundColor}
+            formatSql={formatSql}
+            showMaxConfidenceSlider={false}
+          />
+          <EvalVisualizerSingle
+            getBackgroundColor={getBackgroundColor}
+            formatSql={formatSql}
+            showMaxConfidenceSlider={false}
+          />
+        </div> :
         <FreeForm
           getBackgroundColor={getBackgroundColor}
           formatSql={formatSql}

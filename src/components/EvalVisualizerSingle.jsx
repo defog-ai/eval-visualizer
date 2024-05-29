@@ -5,6 +5,7 @@ import Switch from './Switch';
 const EvalVisualizerSingle = ({
   getBackgroundColor,
   formatSql,
+  showMaxConfidenceSlider = true,
 }) => {
 
   const [dataset, setDataset] = useState("");
@@ -20,6 +21,23 @@ const EvalVisualizerSingle = ({
   const getData = async () => {
     const response = await fetch(`/${dataset}`);
     let data = await response.json()
+
+    // sort by db_name, then question
+    data = data.sort((a, b) => {
+      if (a.db_name < b.db_name) {
+        return -1;
+      } else if (a.db_name > b.db_name) {
+        return 1;
+      } else {
+        if (a.question < b.question) {
+          return -1;
+        } else if (a.question > b.question) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    });
 
     if (searchPattern) {
       data = data.filter((item) => item.question.toLowerCase().includes(searchPattern) || item.generated_query.toLowerCase().includes(searchPattern));
@@ -95,7 +113,7 @@ const EvalVisualizerSingle = ({
           />
         </div>
 
-        <div id="slider-confidence">
+        {showMaxConfidenceSlider && (<div id="slider-confidence">
           <h3>Min Top Prob Threshold</h3>
           <input
             type="range"
@@ -109,7 +127,7 @@ const EvalVisualizerSingle = ({
             }}
           />
           <span>{maxConfidence}</span>
-        </div>
+        </div>)}
       </div>
       
       <div id="summary-statistics">
@@ -138,7 +156,7 @@ const EvalVisualizerSingle = ({
                 className="flex"
               >
                 {data.filter((item) => item.query_category === category)
-                .sort((item) => item.correct === 1 ? -1 : 1)
+                // .sort((item) => item.correct === 1 ? -1 : 1)
                 .map((item) => {
                   return (
                     // a table of hoverable cells with at most 10 columns
