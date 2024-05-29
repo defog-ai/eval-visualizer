@@ -1,6 +1,6 @@
 const Switch = ({
   checked,
-  onChangeFunction,
+  setChecked,
 }) => {
   return (
     <p>
@@ -15,7 +15,7 @@ const Switch = ({
           className="slider"
           id="detail-button"
           checked={checked}
-          onChange={() => onChangeFunction(
+          onChange={() => setChecked(
             (prev) => !prev
           )} />
         <span className="slider round"></span>

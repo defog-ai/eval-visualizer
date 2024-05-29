@@ -186,7 +186,7 @@ const EvalVisualizerSingle = ({
         
         <Switch
           checked={showProbs}
-          onChangeFunction={setShowProbs}
+          setChecked={setShowProbs}
         />
         
         <p>Generated Query:</p>
