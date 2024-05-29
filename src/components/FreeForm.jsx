@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import LogProbsVisualizer from './LogProbsVisualizer';
+import Switch from './Switch';
 
 const FreeForm = ({
   formatSql,
@@ -9,6 +10,7 @@ const FreeForm = ({
   const [prompt, setPrompt] = useState('');
   const [query, setQuery] = useState('');
   const [logprobs, setLogprobs] = useState([]);
+  const [rawPromptMode, setRawPromptMode] = useState(false);
 
   const convertLogprobs = (logprobs) => {
     const logprobs_display = [];
@@ -47,6 +49,12 @@ const FreeForm = ({
           placeholder='Enter the URL of your server'
         />
 
+        <Switch
+          checked={rawPromptMode}
+          setChecked={setRawPromptMode}
+          uncheckedLabel={'Raw Prompt'}
+          checkedLabel={'Use Defog API key'}
+        />
         <h3>Prompt</h3>
         <textarea
           value={prompt}

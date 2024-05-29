@@ -185,6 +185,8 @@ const EvalVisualizerSingle = ({
         </div>
         
         <Switch
+          uncheckedLabel={'Show Query'}
+          checkedLabel={'Show Logprobs'}
           checked={showProbs}
           setChecked={setShowProbs}
         />
