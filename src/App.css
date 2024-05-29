@@ -13,6 +13,14 @@
   padding-left: 1em;
 }
 
+.loading {
+  /* this is a class for a div */
+  /* in this class, there should be a spinner in front of the div, with the div greyed out */
+  background-color: rgba(0, 0, 0, 0.1);
+  color: white;
+  border-radius: 10px;
+}
+
 .cell {
   width: 50px;
   height: 50px;
