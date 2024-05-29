@@ -12,7 +12,6 @@ function App() {
   }
 
   const formatSql = (sql) => {
-    console.log(sql);
     // if sql is empty, undefined, or null, return empty string
     if (!sql) {
       return '';
