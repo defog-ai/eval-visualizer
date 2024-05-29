@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import LogProbsVisualizer from './LogProbsVisualizer';
+import Switch from './Switch';
 
 const EvalVisualizerSingle = ({
   getBackgroundColor,
@@ -63,6 +64,7 @@ const EvalVisualizerSingle = ({
             <option value="classic_new">v1</option>
             <option value="basic_new">Basic</option>
             <option value="advanced_new">Advanced</option>
+            <option value="idk">IDK</option>
           </select>
         </div>
 
@@ -182,25 +184,10 @@ const EvalVisualizerSingle = ({
           <p>Golden Query: <pre>{formatSql(selectedItem?.query)}</pre></p>
         </div>
         
-        <p>
-          Formatted Query
-          <label className="switch" style={{
-            marginBottom: -8,
-            marginLeft: 5,
-            marginRight: 5,
-          }}>
-            <input
-              type="checkbox"
-              className="slider"
-              id="detail-button"
-              checked={showProbs}
-              onChange={() => setShowProbs(
-                (prev) => !prev
-              )} />
-            <span className="slider round"></span>
-          </label>
-          Probabilities
-        </p>
+        <Switch
+          checked={showProbs}
+          onChangeFunction={setShowProbs}
+        />
         
         <p>Generated Query:</p>
         {
