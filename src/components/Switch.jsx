@@ -1,10 +1,12 @@
 const Switch = ({
   checked,
   setChecked,
+  uncheckedLabel, 
+  checkedLabel
 }) => {
   return (
     <p>
-      Formatted Query
+      {uncheckedLabel}
       <label className="switch" style={{
         marginBottom: -8,
         marginLeft: 5,
@@ -20,7 +22,7 @@ const Switch = ({
           )} />
         <span className="slider round"></span>
       </label>
-      Probabilities
+      {checkedLabel}
     </p>
   )
 }
