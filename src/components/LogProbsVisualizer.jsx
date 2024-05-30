@@ -10,7 +10,6 @@ const LogProbsVisualizer = ({
     <div>
       <div style={{
         width: "80%",
-        paddingBottom: 200
       }}>
         {(selectedItem?.logprobs || []).map(
           (item, idx) => {
