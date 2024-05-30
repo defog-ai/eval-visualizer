@@ -28,9 +28,14 @@ const AttentionVisualizer = ({
         })
       }
     );
-    setLoading(false);
+
+    // time the json parsing
+    const start = performance.now();
     const respData = await response.json();
+    const end = performance.now();
+    console.log(`Parsing time: ${end - start}ms`);
     console.log(respData);
+    setLoading(false);
     const data = respData.activations;
     setActivationsData(data);
 
@@ -45,8 +50,11 @@ const AttentionVisualizer = ({
   }, [prompt])
 
   return (
-    <div className={loading ? 'loading': 'not-loading'}>
+    <div>
       {/* choose step between current step and length of data object */}
+      
+      {loading && <p>Loading...</p>}
+      
       <input
         type="range"
         min={0}
