@@ -1,15 +1,40 @@
 import { useState, useEffect } from 'react'
-import data from './act.json'
+// import data from './act.json'
 
 const AttentionVisualizer = ({
   getBackgroundColor,
+  prompt,
+  modelName = 'defog/sqlcoder8b-padded-alpha'
 }) => {
   const [decodedTokens, setDecodedTokens] = useState(null);
+  const [activationsData, setActivationsData] = useState([]);
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
 
-  const getData = () => {
+  const getData = async() => {
+    if (!prompt) {
+      return;
+    }
+    setLoading(true);
+    const response = await fetch(`${import.meta.env.VITE_ATTENTION_ENDPOINT}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          model_name: modelName,
+        })
+      }
+    );
+    setLoading(false);
+    const respData = await response.json();
+    console.log(respData);
+    const data = respData.activations;
+    setActivationsData(data);
+
     const maxStep = Object.keys(data).length - 1;
-    
     // only keep the last maxSteps tokens
     const decodedTokens = data[maxStep].map((item) => item.token).slice(-maxStep);
     setDecodedTokens(decodedTokens);
@@ -17,15 +42,15 @@ const AttentionVisualizer = ({
 
   useEffect(() => {
     getData();
-  }, [])
+  }, [prompt])
 
   return (
-    <div>
+    <div className={loading ? 'loading': 'not-loading'}>
       {/* choose step between current step and length of data object */}
       <input
         type="range"
         min={0}
-        max={data ? Object.keys(data).length - 1 : 0}
+        max={activationsData ? Object.keys(activationsData).length - 1 : 0}
         value={step}
         onChange={
           (ev) => {
@@ -34,15 +59,14 @@ const AttentionVisualizer = ({
         }
       />
 
-      <h3>New token generated at this step</h3>
-      <pre>
-        {decodedTokens?.[parseInt(step)]}
-      </pre>
+      <p>
+        New token generated at this step: <code>{decodedTokens?.[parseInt(step)]}</code>
+      </p>
 
       {/* display attention data */}
       <div>
-        {data?.[String(step)]?.map((item) => (
-          item.token === "\n" ? <br /> :
+        {activationsData?.[String(step)]?.map((item) => (
+          item.token === "\n" ? <br key={Math.random()} /> :
           item.token === "\n\n" ? <><br /><br /></> :
           <div
             key={Math.random()}
@@ -53,6 +77,9 @@ const AttentionVisualizer = ({
               padding: '5px',
               margin: '5px',
               borderRadius: '5px',
+              fontSize: 11,
+              lineHeight: 0.8,
+              fontFamily: 'monospace',
             }}
           >
             {item.token}

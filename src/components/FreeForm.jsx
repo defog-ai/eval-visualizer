@@ -6,7 +6,7 @@ const FreeForm = ({
   formatSql,
   getBackgroundColor,
 }) => {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState(import.meta.env.VITE_GENERATE_ENDPOINT);
   const [prompt, setPrompt] = useState('');
   const [query, setQuery] = useState('');
   const [logprobs, setLogprobs] = useState([]);

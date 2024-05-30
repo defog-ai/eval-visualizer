@@ -3,12 +3,11 @@ import chroma from "chroma-js";
 import { format } from 'sql-formatter';
 import EvalVisualizerSingle from './components/EvalVisualizerSingle';
 import FreeForm from './components/FreeForm';
-import AttentionVisualizer from './components/AttentionVisualizer';
 import './App.css';
 
 function App() {
 
-  const getBackgroundColor = (prob, scale=[0.15, 0.3, 0.1]) => {
+  const getBackgroundColor = (prob, scale=[0.15, 0.3, 1.0]) => {
     return chroma.scale(['pink', 'yellow', 'lightgreen']).domain(scale)(prob).hex();
   }
 
@@ -48,7 +47,6 @@ function App() {
         <option value="single">View a standalone eval</option>
         <option value="compare">Compare two evals</option>
         <option value="freeform">Ask a question and see logprobs</option>
-        <option value="attention">Visualize attention</option>
       </select>
       {
         view === 'single' ?
@@ -75,9 +73,6 @@ function App() {
         <FreeForm
           getBackgroundColor={getBackgroundColor}
           formatSql={formatSql}
-        /> : view === 'attention' ?
-        <AttentionVisualizer
-          getBackgroundColor={getBackgroundColor}
         /> :
         <div>
           <h3>Coming soon...</h3>

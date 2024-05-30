@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import LogProbsVisualizer from './LogProbsVisualizer';
 import Switch from './Switch';
+import AttentionVisualizer from './AttentionVisualizer';
 
 const EvalVisualizerSingle = ({
   getBackgroundColor,
@@ -17,7 +18,8 @@ const EvalVisualizerSingle = ({
   const [selectedItem, setSelectedItem] = useState(null);
   const [showProbs, setShowProbs] = useState(false);
   const [availableFiles, setAvailableFiles] = useState([]);
-  
+  const [modalVisible, setModalVisible] = useState(false);
+
   const getData = async () => {
     const response = await fetch(`/${dataset}`);
     let data = await response.json()
@@ -189,8 +191,8 @@ const EvalVisualizerSingle = ({
           right: 0,
           top: 0,
           width: 600,
-          maxWidth: "100%",
           height: "100%",
+          maxWidth: "100%",
           backgroundColor: "white",
           padding: 20,
           borderLeft: "1px solid black",
@@ -216,6 +218,22 @@ const EvalVisualizerSingle = ({
           <p>Golden Query: <pre>{formatSql(selectedItem?.query)}</pre></p>
         </div>
         
+        <button
+          onClick={() => {
+            setModalVisible(true);
+          }}
+          style={{
+            backgroundColor: "blue",
+            color: "white",
+            padding: 10,
+            borderRadius: 5,
+            cursor: "pointer",
+            marginBottom: "2em",
+          }}
+        >
+          Show Modal
+        </button>
+
         <Switch
           uncheckedLabel={'Show Query'}
           checkedLabel={'Show Logprobs'}
@@ -234,7 +252,43 @@ const EvalVisualizerSingle = ({
           <pre>{formatSql(selectedItem?.generated_query)}</pre>
         }
         {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
+
       </div>
+      {modalVisible ? <div
+        className="modal"
+        style={{
+          display: modalVisible ? "block" : "none",
+          // modal is a full screen overlay with some padding on the sides
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 100,
+          padding: 20,
+          backgroundColor: "rgb(255, 255, 255)",
+          overflowY: "scroll",
+        }}
+      >
+        <AttentionVisualizer
+          getBackgroundColor={getBackgroundColor}
+          prompt={selectedItem?.prompt || ""}
+        />
+        <button
+          onClick={() => {
+            setModalVisible(false);
+          }}
+          style={{
+            backgroundColor: "red",
+            color: "white",
+            padding: 10,
+            borderRadius: 5,
+            cursor: "pointer",
+          }}
+        >
+          Close Modal
+        </button>
+      </div> : null}
     </div>
   )
 }

@@ -25,3 +25,6 @@ dist-ssr
 
 # json files inside public folder
 public/**/*.json
+
+# env files
+.env
