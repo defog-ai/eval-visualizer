@@ -5,8 +5,9 @@ This repo helps visualize the results of sql-eval better, and checking where th
 ## Running the repo
 1. Make sure that this repo is contained within the `sql-eval` folder
 2. `cd` into the folder containing this repo, and install dependencies with `npm i`
-3. Run the repo with `npm run dev`
-4. Profit!
+3. Create a `.env` file, with the same variables as `.env.template`. Then replace those with your own variable names.
+4. Run the repo with `npm run dev`
+5. Profit!
 
 ## Adding data from a vLLM API run
 _Note: Currently, only the custom Defog implementation of the vLLM API server is supported. We hope to expand this to other runners in the future._
