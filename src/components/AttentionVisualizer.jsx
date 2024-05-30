@@ -53,47 +53,50 @@ const AttentionVisualizer = ({
     <div>
       {/* choose step between current step and length of data object */}
       
-      {loading && <p>Loading...</p>}
-      
-      <input
-        type="range"
-        min={0}
-        max={activationsData ? Object.keys(activationsData).length - 1 : 0}
-        value={step}
-        onChange={
-          (ev) => {
-            setStep(parseInt(ev.target.value))
+      {loading ?
+      <h1>Loading...</h1> :
+      <>
+        <input
+          type="range"
+          min={0}
+          max={activationsData ? Object.keys(activationsData).length - 1 : 0}
+          value={step}
+          onChange={
+            (ev) => {
+              setStep(parseInt(ev.target.value))
+            }
           }
-        }
-      />
+        />
 
-      <p>
-        New token generated at this step: <code>{decodedTokens?.[parseInt(step)]}</code>
-      </p>
+        <p>
+          New token generated at this step: <code>{decodedTokens?.[parseInt(step)]}</code>
+        </p>
 
-      {/* display attention data */}
-      <div>
-        {activationsData?.[String(step)]?.map((item) => (
-          item.token === "\n" ? <br key={Math.random()} /> :
-          item.token === "\n\n" ? <><br /><br /></> :
-          <div
-            key={Math.random()}
-            title={item.attn.toFixed(2)}
-            style={{
-              backgroundColor: getBackgroundColor(item.attn, [0.5, 1, 2]),
-              display: 'inline-block',
-              padding: '5px',
-              margin: '5px',
-              borderRadius: '5px',
-              fontSize: 11,
-              lineHeight: 0.8,
-              fontFamily: 'monospace',
-            }}
-          >
-            {item.token}
-          </div>
-        ))}
-      </div>
+        {/* display attention data */}
+        <div>
+          {activationsData?.[String(step)]?.map((item) => (
+            item.token === "\n" ? <br key={Math.random()} /> :
+            item.token === "\n\n" ? <><br /><br /></> :
+            <div
+              key={Math.random()}
+              title={item.attn.toFixed(2)}
+              style={{
+                backgroundColor: getBackgroundColor(item.attn, [0.5, 1, 2]),
+                display: 'inline-block',
+                padding: '5px',
+                margin: '5px',
+                borderRadius: '5px',
+                fontSize: 11,
+                lineHeight: 0.8,
+                fontFamily: 'monospace',
+              }}
+            >
+              {item.token}
+            </div>
+          ))}
+        </div>
+      </>
+      }
     </div>
   )
 }
