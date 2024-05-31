@@ -241,17 +241,21 @@ const EvalVisualizerSingle = ({
           setChecked={setShowProbs}
         />
         
-        <p>Generated Query:</p>
-        {
-          showProbs ?
-          <LogProbsVisualizer
-            selectedItem={selectedItem}
-            getBackgroundColor={getBackgroundColor}
-          />
-          :
-          <pre>{formatSql(selectedItem?.generated_query)}</pre>
-        }
-        {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
+        <div style={{
+          paddingBottom: 200
+        }}>
+          <p>Generated Query:</p>
+          {
+            showProbs ?
+            <LogProbsVisualizer
+              selectedItem={selectedItem}
+              getBackgroundColor={getBackgroundColor}
+            />
+            :
+            <pre>{formatSql(selectedItem?.generated_query)}</pre>
+          }
+          {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
+        </div>
 
       </div>
       {modalVisible ? <div
