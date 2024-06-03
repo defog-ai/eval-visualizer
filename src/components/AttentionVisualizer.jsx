@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 const AttentionVisualizer = ({
   getBackgroundColor,
   prompt,
-  modelName = 'defog/sqlcoder8b-padded-alpha'
+  modelName = 'defog/sqlcoder-8b-padded-sorry'
 }) => {
   const [decodedTokens, setDecodedTokens] = useState(null);
   const [activationsData, setActivationsData] = useState([]);
