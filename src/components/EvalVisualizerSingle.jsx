@@ -19,10 +19,23 @@ const EvalVisualizerSingle = ({
   const [showProbs, setShowProbs] = useState(false);
   const [availableFiles, setAvailableFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getData = async () => {
-    const response = await fetch(`/${dataset}`);
-    let data = await response.json()
+    if (!dataset) {
+      return;
+    }
+    setLoading(true);
+    // check if dataset is part of availableFiles
+    let urlToFetch;
+    if (availableFiles.includes(dataset)) {
+      urlToFetch = `/${dataset}`;
+    } else {
+      urlToFetch = `${import.meta.env.VITE_BUCKET_ENDPOINT}/${dataset}.json`;
+    }
+    const response = await fetch(urlToFetch);
+    let data = await response.json();
+    setLoading(false);
 
     // sort by db_name, then question
     data = data.sort((a, b) => {
@@ -81,25 +94,24 @@ const EvalVisualizerSingle = ({
   }, [dataset, searchPattern, maxConfidence]);
 
   return (
-    <div>
+    <div className={loading ? 'loading': 'not-loading'}>
       <div className="flex">
         <div id="options">
-          <h3>Eval Type</h3>
-          <select
-            style={{ width: 240 }}
-            value={dataset}
-            onChange={
-              (ev) => {
+          <h3>Eval Name</h3>
+          <input type="text" list="run-names" onKeyDown={
+            (ev) => {
+              if (ev.key === "Enter") {
                 setDataset(ev.target.value);
               }
             }
-          >
+          }></input>
+          <datalist id="run-names">
             {availableFiles.map((file) => {
               return (
                 <option key={file} value={file}>{file}</option>
               );
             })}
-          </select>
+          </datalist>
         </div>
 
         <div id="search">
