@@ -227,25 +227,18 @@ const EvalVisualizerSingle = ({
         {selectedItem?.instructions ? <p>Instructions: <pre>{selectedItem.instructions}</pre></p> : null}
         
         <div>
+          {/* copy to clipboard button */}
           <p>Golden Query: <pre>{formatSql(selectedItem?.query)}</pre></p>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(selectedItem?.query);
+              alert("Golden Query Copied to Clipboard!");
+            }}
+          >
+            Copy Golden Query to Clipboard
+          </button>
         </div>
         
-        <button
-          onClick={() => {
-            setModalVisible(true);
-          }}
-          style={{
-            backgroundColor: "blue",
-            color: "white",
-            padding: 10,
-            borderRadius: 5,
-            cursor: "pointer",
-            marginBottom: "2em",
-          }}
-        >
-          Show Modal
-        </button>
-
         <Switch
           uncheckedLabel={'Show Query'}
           checkedLabel={'Show Logprobs'}
@@ -264,10 +257,37 @@ const EvalVisualizerSingle = ({
               getBackgroundColor={getBackgroundColor}
             />
             :
-            <pre>{formatSql(selectedItem?.generated_query)}</pre>
+            <>
+              <pre>{formatSql(selectedItem?.generated_query)}</pre>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(selectedItem?.generated_query);
+                  alert("Generated Query Copied to Clipboard!");
+                }}
+              >
+                Copy Generated Query to Clipboard
+              </button>
+            </>
           }
           {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
         </div>
+
+        <button
+          onClick={() => {
+            setModalVisible(true);
+          }}
+          style={{
+            backgroundColor: "blue",
+            color: "white",
+            padding: 10,
+            borderRadius: 5,
+            cursor: "pointer",
+            marginBottom: "2em",
+          }}
+        >
+          Show Attention Modal
+        </button>
+
 
       </div>
       {modalVisible ? <div
