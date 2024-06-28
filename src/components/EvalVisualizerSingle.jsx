@@ -177,9 +177,9 @@ const EvalVisualizerSingle = ({
                     // each cell is colored by the correct/incorrect status
                     <span
                       key={item.question}
-                      className={item.error_db_exec === 1 ? "cell error-cell" : "cell"}
+                      className={(item.error_db_exec === 1 && !(selectedItem?.question === item.question && siderVisible)) ? "cell error-cell" : "cell"}
                       style={{
-                        backgroundColor: item.correct === 1 ? "green" : "red",
+                        backgroundColor: selectedItem?.question === item.question && siderVisible ? "grey" : item.correct === 1 ? "green" : "red",
                       }}
                       onClick={() => {
                         selectedItem?.question === item.question && siderVisible ?
