@@ -88,7 +88,7 @@ def execute_query(query, db_type, db_name):
                     else:
                         row_dict[col] = val
                 result_list.append(row_dict)
-
+            result.close()
             return result_list
     except SQLAlchemyError as e:
         return {"error": str(e)}
