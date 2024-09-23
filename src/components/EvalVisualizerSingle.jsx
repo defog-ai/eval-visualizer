@@ -232,6 +232,9 @@ const EvalVisualizerSingle = ({
                           setSiderVisible(false) :
                           setSiderVisible(true)
                         setSelectedItem(item);
+                        setGoldenQueryResult(null); // Reset previous golden results
+                        setGeneratedQueryResult(null); // Reset previous generated results
+                        setErrorMessage({"golden": null, "generated": null}); // Reset previous error messages
                       }}
                     >
                       &nbsp;
@@ -302,7 +305,8 @@ const EvalVisualizerSingle = ({
         </button>
 
         {/* Display results for Golden Query */}
-        <ResultsTable results={goldenQueryResult} />
+        {goldenQueryResult && <ResultsTable results={goldenQueryResult} />}
+
 
         {errorMessage.golden && (
           <div style={{ color: 'red' }}>
@@ -342,6 +346,7 @@ const EvalVisualizerSingle = ({
             </>
           }
           {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
+          {selectedItem?.error_db_exec !== 1 && 
           <div>
             {/* Button for running the Generated Query */}
             <button
@@ -359,9 +364,10 @@ const EvalVisualizerSingle = ({
               Run Generated Query
             </button>
           </div>
+          }
           
           {/* Display results for Generated Query */}
-          <ResultsTable results={generatedQueryResult} />
+          {generatedQueryResult && <ResultsTable results={generatedQueryResult} />}
 
           {/* Display error messages separately */}
           {errorMessage.generated && (
