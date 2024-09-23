@@ -7,6 +7,7 @@ from enum import Enum
 from decimal import Decimal
 import os
 from dotenv import load_dotenv
+import uvicorn
 
 # Load environment variables from .env file
 load_dotenv()
@@ -23,7 +24,10 @@ app.add_middleware(
 )
 
 # Load the SQLite DB path from the environment
-SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "../defog-data/sqlite_dbs")  # Default value if not in env
+SQLITE_DB_PATH = os.getenv(
+    "SQLITE_DB_PATH", "../defog-data/sqlite_dbs"
+)  # Default value if not in env
+
 
 # Enum for Database Types
 class DBType(str, Enum):
@@ -38,7 +42,7 @@ creds = {
     "mysql": "mysql+mysqlconnector://root:password@localhost/",
     "postgres": "postgresql+psycopg2://postgres:password@localhost/",
     "sqlite": "sqlite:///",
-    "tsql": "mssql+pyodbc://sa:password@localhost/{db_name}?driver=ODBC+Driver+17+for+SQL+Server"
+    "tsql": "mssql+pyodbc://sa:password@localhost/{db_name}?driver=ODBC+Driver+17+for+SQL+Server",
 }
 
 
@@ -104,3 +108,7 @@ def execute_query(query, db_type, db_name):
             return result_list
     except SQLAlchemyError as e:
         return {"error": str(e)}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
