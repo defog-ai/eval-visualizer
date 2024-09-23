@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "source .env && python get_fnames.py && vite --host 0.0.0.0",
+    "dev": "concurrently \"source .env && python get_fnames.py && vite --host 0.0.0.0\" \"uvicorn backend.main:app --reload\"",
     "build": "source .env && python get_fnames.py && vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
@@ -19,6 +19,7 @@
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
+    "concurrently": "^7.6.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
