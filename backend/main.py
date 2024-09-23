@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # Load the SQLite DB path from the environment
-SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "/default/path/to/sqlite/files")  # Default value if not in env
+SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "../defog-data/sqlite_dbs")  # Default value if not in env
 
 # Enum for Database Types
 class DBType(str, Enum):
