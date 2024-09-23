@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import LogProbsVisualizer from './LogProbsVisualizer';
 import Switch from './Switch';
 import AttentionVisualizer from './AttentionVisualizer';
-
+import ResultsTable from './ResultsTable';
 const EvalVisualizerSingle = ({
   getBackgroundColor,
   formatSql,
@@ -19,7 +19,11 @@ const EvalVisualizerSingle = ({
   const [showProbs, setShowProbs] = useState(false);
   const [availableFiles, setAvailableFiles] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [goldenQueryResult, setGoldenQueryResult] = useState(null); // Store the results of the golden query
+  const [generatedQueryResult, setGeneratedQueryResult] = useState(null); // Store the results of the generated query]
+  const [errorMessage, setErrorMessage] = useState({"golden": null, "generated": null}); // Store the error message for the golden and generated queries
   const [loading, setLoading] = useState(false);
+
 
   const getData = async () => {
     if (!dataset) {
@@ -92,6 +96,48 @@ const EvalVisualizerSingle = ({
   useEffect(() => {
     getData(dataset);
   }, [dataset, searchPattern, maxConfidence]);
+
+  const runQuery = async (queryType) => {
+    if (!selectedItem) {
+      return;
+    }
+    console.log('Running query on:', selectedItem);
+  
+    const queryToRun = queryType === "golden" ? selectedItem.query : selectedItem.generated_query;
+    console.log('Query to run:', queryToRun);
+  
+    try {
+      const response = await fetch('http://localhost:8000/run_query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: queryToRun, // Run either the golden or generated query
+          db_type: selectedItem.db_type.toLowerCase(), // Use the selected db type
+          db_name: selectedItem.db_name, // Use the selected db name
+        }),
+      });
+  
+      const result = await response.json();
+  
+      if (queryType === "golden") {
+        setGoldenQueryResult(result.result); // Store golden query result
+        setErrorMessage(prev => ({ ...prev, golden: null })); // Clear golden query error
+      } else {
+        setGeneratedQueryResult(result.result); // Store generated query result
+        setErrorMessage(prev => ({ ...prev, generated: null })); // Clear generated query error
+      }
+    } catch (error) {
+      console.error('Error running query:', error);
+      if (queryType === "golden") {
+        setErrorMessage(prev => ({ ...prev, golden: 'Failed to execute the golden query' })); // Set error for golden query
+      } else {
+        setErrorMessage(prev => ({ ...prev, generated: 'Failed to execute the generated query' })); // Set error for generated query
+      }
+    }
+  };  
+  
 
   return (
     <div className={loading ? 'loading': 'not-loading'}>
@@ -238,6 +284,32 @@ const EvalVisualizerSingle = ({
             Copy Golden Query to Clipboard
           </button>
         </div>
+
+        {/* Button for running the Golden Query */}
+        <button
+          onClick={() => runQuery("golden")}
+          style={{
+            backgroundColor: "blue",
+            color: "white",
+            padding: 10,
+            borderRadius: 5,
+            cursor: "pointer",
+            marginBottom: "1em",
+            marginTop: "2em",
+          }}
+        >
+          Run Golden Query
+        </button>
+
+        {/* Display results for Golden Query */}
+        <ResultsTable results={goldenQueryResult} />
+
+        {errorMessage.golden && (
+          <div style={{ color: 'red' }}>
+            <h3>Error:</h3>
+            <p>{errorMessage.golden}</p>
+          </div>
+        )}
         
         <Switch
           uncheckedLabel={'Show Query'}
@@ -270,25 +342,51 @@ const EvalVisualizerSingle = ({
             </>
           }
           {selectedItem?.error_db_exec === 1 ? <p>Error Message: <pre>{selectedItem?.error_msg}</pre></p> : null}
-        </div>
+          <div>
+            {/* Button for running the Generated Query */}
+            <button
+              onClick={() => runQuery("generated")}
+              style={{
+                backgroundColor: "green",
+                color: "white",
+                padding: 10,
+                borderRadius: 5,
+                cursor: "pointer",
+                marginBottom: "1em",
+                marginTop: "2em",
+              }}
+            >
+              Run Generated Query
+            </button>
+          </div>
+          
+          {/* Display results for Generated Query */}
+          <ResultsTable results={generatedQueryResult} />
 
-        <button
-          onClick={() => {
-            setModalVisible(true);
-          }}
-          style={{
-            backgroundColor: "blue",
-            color: "white",
-            padding: 10,
-            borderRadius: 5,
-            cursor: "pointer",
-            marginBottom: "2em",
-          }}
-        >
-          Show Attention Modal
-        </button>
+          {/* Display error messages separately */}
+          {errorMessage.generated && (
+            <div style={{ color: 'red' }}>
+              <h3>Error:</h3>
+              <p>{errorMessage.generated}</p>
+            </div>
+          )}
+          </div>
 
-
+          <button
+            onClick={() => {
+              setModalVisible(true);
+            }}
+            style={{
+              backgroundColor: "blue",
+              color: "white",
+              padding: 10,
+              borderRadius: 5,
+              cursor: "pointer",
+              marginBottom: "2em",
+            }}
+          >
+            Show Attention Modal
+          </button>
       </div>
       {modalVisible ? <div
         className="modal"
