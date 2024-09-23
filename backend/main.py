@@ -58,8 +58,6 @@ async def run_query(request: RunQuery):
 def execute_query(query, db_type, db_name):
     # Create the base URL for the database type
     db_url = creds.get(db_type.value)
-    print("db_url here", db_url)
-
     if not db_url:
         return {"error": "Invalid database type"}
 
@@ -73,7 +71,6 @@ def execute_query(query, db_type, db_name):
 
         with engine.connect() as connection:
             result = connection.execute(text(query))
-            print("result here", result)
             rows = result.fetchall()
 
             # Convert rows into dictionaries if they are more than single values
