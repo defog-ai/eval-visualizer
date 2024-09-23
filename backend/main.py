@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
 from enum import Enum
+from decimal import Decimal
 
 app = FastAPI()
 
@@ -16,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Enum for Database Types
 class DBType(str, Enum):
     postgres = "postgres"
@@ -23,12 +25,14 @@ class DBType(str, Enum):
     sqlite = "sqlite"
     tsql = "tsql"
 
+
 # Database connection strings without a pre-defined database
 creds = {
-    "mysql": "mysql+mysqlconnector://root:password@localhost/derm_treatment",
+    "mysql": "mysql+mysqlconnector://root:password@localhost/",
     "postgres": "postgresql+psycopg2://postgres:password@localhost/",
-    "sqlite": "sqlite:///your_sqlite_db.db"  # Local SQLite file
+    "sqlite": "sqlite:///",  # Local SQLite file
 }
+
 
 # Request Model for POST request
 class RunQuery(BaseModel):
@@ -36,44 +40,55 @@ class RunQuery(BaseModel):
     db_type: DBType  # The type of the database
     query: str  # The actual SQL query to execute
 
+
 @app.get("/")
 def index():
     return {"message": "Welcome to the FastAPI server"}
 
-# POST Endpoint to Run Query
+
 @app.post("/run_query")
-def run_query(request: RunQuery):
+async def run_query(request: RunQuery):
     db_name = request.db_name
     db_type = request.db_type
     query = request.query
     result = execute_query(query, db_type, db_name)
     return {"result": result}
 
+
 def execute_query(query, db_type, db_name):
     # Create the base URL for the database type
     db_url = creds.get(db_type.value)
-    
+    print("db_url here", db_url)
+
     if not db_url:
         return {"error": "Invalid database type"}
 
     try:
         # For MySQL and Postgres, dynamically append the database name
-        # if db_type in {DBType.mysql, DBType.postgres}:
-        #     db_url = db_url + db_name
-        #     print(f"Connecting to database: {db_url}")
+        if db_type in {DBType.mysql, DBType.postgres, DBType.sqlite}:
+            db_url = db_url + db_name
 
         # Use SQLAlchemy to connect to the database
-        print(f"Connecting to database: {db_url}")
         engine = create_engine(db_url)
 
         with engine.connect() as connection:
-            print(f"Executing query: {query}")
-            result = connection.execute(text(query))  # Wrap query with `text()`
-            print(f"Query executed successfully")
-            
-            # Fetch all rows and return them as a list of dictionaries
-            rows = [dict(row) for row in result.fetchall()]
-            return rows
+            result = connection.execute(text(query))
+            print("result here", result)
+            rows = result.fetchall()
+
+            # Convert rows into dictionaries if they are more than single values
+            column_names = result.keys()
+            result_list = []
+            for row in rows:
+                row_dict = {}
+                for col, val in zip(column_names, row):
+                    # Convert Decimal to float or str before returning because JSON doesn't support Decimal
+                    if isinstance(val, Decimal):
+                        row_dict[col] = float(val)
+                    else:
+                        row_dict[col] = val
+                result_list.append(row_dict)
+
+            return result_list
     except SQLAlchemyError as e:
-        print(f"SQLAlchemy error: {str(e)}")  # Log the error
         return {"error": str(e)}
