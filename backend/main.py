@@ -5,6 +5,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from pydantic import BaseModel
 from enum import Enum
 from decimal import Decimal
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = FastAPI()
 
@@ -17,6 +22,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Load the SQLite DB path from the environment
+SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "/default/path/to/sqlite/files")  # Default value if not in env
 
 # Enum for Database Types
 class DBType(str, Enum):
@@ -30,7 +37,8 @@ class DBType(str, Enum):
 creds = {
     "mysql": "mysql+mysqlconnector://root:password@localhost/",
     "postgres": "postgresql+psycopg2://postgres:password@localhost/",
-    "sqlite": "sqlite:///",  # Local SQLite file
+    "sqlite": "sqlite:///",
+    "tsql": "mssql+pyodbc://sa:password@localhost/{db_name}?driver=ODBC+Driver+17+for+SQL+Server"
 }
 
 
@@ -63,8 +71,15 @@ def execute_query(query, db_type, db_name):
 
     try:
         # For MySQL and Postgres, dynamically append the database name
-        if db_type in {DBType.mysql, DBType.postgres, DBType.sqlite}:
+        if db_type in {DBType.mysql, DBType.postgres}:
             db_url = db_url + db_name
+        elif db_type == DBType.sqlite:
+            # For SQLite, prepend the path to the database file and append the .db extension
+            sqlite_file_path = os.path.join(SQLITE_DB_PATH, db_name + ".db")
+            db_url = db_url + sqlite_file_path
+        elif db_type == DBType.tsql:
+            # For SQL Server (T-SQL), format the connection string
+            db_url = db_url.format(db_name=db_name)
 
         # Use SQLAlchemy to connect to the database
         engine = create_engine(db_url)
