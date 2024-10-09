@@ -22,6 +22,7 @@ const EvalVisualizerSingle = ({
   const [goldenQueryResult, setGoldenQueryResult] = useState(null); // Store the results of the golden query
   const [generatedQueryResult, setGeneratedQueryResult] = useState(null); // Store the results of the generated query]
   const [errorMessage, setErrorMessage] = useState({"golden": null, "generated": null}); // Store the error message for the golden and generated queries
+  const [resultsSource, setResultsSource] = useState(""); // Store the source of the results (postgresgolden or dialct golden)
   const [loading, setLoading] = useState(false);
 
 
@@ -138,7 +139,66 @@ const EvalVisualizerSingle = ({
     }
   };  
   
-
+  const runPostgresGoldenQuery = async () => {
+    if (!selectedItem) {
+      return;
+    }
+  
+    const question = selectedItem.question;
+    const datasetName = dataset.toLowerCase();
+  
+    // Determine which JSON file to use based on the dataset name.
+    let jsonFile;
+    if (datasetName.includes("advanced")) {
+      jsonFile = "api_advanced_cot.json";
+    } else if (datasetName.includes("v1")) {
+      jsonFile = "api_v1_cot.json";
+    } else if (datasetName.includes("basic")) {
+      jsonFile = "api_basic.json";
+    } else {
+      console.error("No matching JSON file found for the dataset.");
+      setErrorMessage(prev => ({ ...prev, golden: 'No matching JSON file found for the dataset.' }));
+      return;
+    }
+  
+    try {
+      // Fetch the JSON file and search for the golden query corresponding to the question.
+      const jsonResponse = await fetch(`/${jsonFile}`);
+      const jsonData = await jsonResponse.json();
+  
+      // Find the matching golden query for the selected question.
+      const matchedItem = jsonData.find(item => item.question === question);
+      if (!matchedItem) {
+        console.error('Question not found in the selected JSON file.');
+        setErrorMessage(prev => ({ ...prev, golden: 'Question not found in the selected JSON file.' }));
+        return;
+      }
+  
+      const queryToRun = matchedItem.query;
+  
+      // Run the selected query.
+      const response = await fetch('http://localhost:8000/run_query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: queryToRun,
+          db_type: 'postgres',
+          db_name: selectedItem.db_name,
+        }),
+      });
+  
+      const result = await response.json();
+      setGoldenQueryResult(result.result);
+      setResultsSource("postgresgolden");
+      setErrorMessage(prev => ({ ...prev, golden: null }));
+    } catch (error) {
+      console.error('Error running query:', error);
+      setErrorMessage(prev => ({ ...prev, golden: 'Failed to execute the postgres golden query' }));
+    }
+  };
+  
   return (
     <div className={loading ? 'loading': 'not-loading'}>
       <div className="flex">
@@ -304,6 +364,26 @@ const EvalVisualizerSingle = ({
           Run Golden Query
         </button>
 
+        {/* Postgres Golden Query button */}
+        {selectedItem?.db_type.toLowerCase() !== "postgres" && (
+          <button
+            onClick={runPostgresGoldenQuery}
+            style={{
+              backgroundColor: "purple",
+              color: "white",
+              padding: 10,
+              borderRadius: 5,
+              cursor: "pointer",
+              marginBottom: "1em",
+              marginTop: "2em",
+              marginLeft: "1em",
+            }}
+          >
+            Run Postgres Golden Query
+          </button>
+        )}
+        {/* Indicator that the results are from postgres golden query */}
+        {resultsSource === "postgresgolden" && <p>Results from Postgres Golden Query</p>}
         {/* Display results for Golden Query */}
         {goldenQueryResult && <ResultsTable results={goldenQueryResult} />}
 
