@@ -124,6 +124,7 @@ const EvalVisualizerSingle = ({
   
       if (queryType === "golden") {
         setGoldenQueryResult(result.result); // Store golden query result
+        setResultsSource(""); // Reset results source
         setErrorMessage(prev => ({ ...prev, golden: null })); // Clear golden query error
       } else {
         setGeneratedQueryResult(result.result); // Store generated query result
@@ -383,7 +384,7 @@ const EvalVisualizerSingle = ({
           </button>
         )}
         {/* Indicator that the results are from postgres golden query */}
-        {resultsSource === "postgresgolden" && <p>Results from Postgres Golden Query</p>}
+        {resultsSource === "postgresgolden" && <p>Results of the reference postgres Golden Query:</p>}
         {/* Display results for Golden Query */}
         {goldenQueryResult && <ResultsTable results={goldenQueryResult} />}
 
