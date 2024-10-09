@@ -1,0 +1,7 @@
+fastapi
+starlette
+anyio
+sniffio
+uvicorn[standard]
+pydantic
+sqlalchemy
