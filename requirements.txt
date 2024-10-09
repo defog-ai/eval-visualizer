@@ -1,7 +1,12 @@
+# Python Server Requirements
 fastapi
 starlette
 anyio
 sniffio
 uvicorn[standard]
 pydantic
+
+# Database connectors
 sqlalchemy
+mysql-connector-python
+psycopg2-binary
