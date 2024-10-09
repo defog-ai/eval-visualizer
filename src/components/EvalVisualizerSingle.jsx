@@ -85,7 +85,6 @@ const EvalVisualizerSingle = ({
   const getFiles = async () => {
     const response = await fetch(`/fnames.json`);
     const files = await response.json();
-    console.log(files);
     setAvailableFiles(files);
     setDataset(files[0]);
   }
@@ -102,10 +101,8 @@ const EvalVisualizerSingle = ({
     if (!selectedItem) {
       return;
     }
-    console.log('Running query on:', selectedItem);
   
     const queryToRun = queryType === "golden" ? selectedItem.query : selectedItem.generated_query;
-    console.log('Query to run:', queryToRun);
   
     try {
       const response = await fetch('http://localhost:8000/run_query', {
@@ -155,7 +152,7 @@ const EvalVisualizerSingle = ({
     } else if (datasetName.includes("v1")) {
       jsonFile = "api_v1_cot.json";
     } else if (datasetName.includes("basic")) {
-      jsonFile = "api_basic.json";
+      jsonFile = "api_basic_cot.json";
     } else {
       console.error("No matching JSON file found for the dataset.");
       setErrorMessage(prev => ({ ...prev, golden: 'No matching JSON file found for the dataset.' }));
