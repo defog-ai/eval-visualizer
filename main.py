@@ -40,7 +40,7 @@ class DBType(str, Enum):
 # Database connection strings without a pre-defined database
 creds = {
     "mysql": "mysql+mysqlconnector://root:password@localhost/",
-    "postgres": "postgresql+psycopg2://postgres:password@localhost/",
+    "postgres": "postgresql+psycopg2://postgres:postgres@localhost/",
     "sqlite": "sqlite:///",
     "tsql": "mssql+pyodbc://sa:password@localhost/{db_name}?driver=ODBC+Driver+17+for+SQL+Server",
 }

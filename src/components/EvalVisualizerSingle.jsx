@@ -63,7 +63,7 @@ const EvalVisualizerSingle = ({
       data = data.filter((item) => item.question.toLowerCase().includes(searchPattern) || item.generated_query.toLowerCase().includes(searchPattern));
     }
 
-    if (maxConfidence) {
+    if (maxConfidence && data[0]?.logprobs) {
       // check if the min of all rank_1_probs is less than maxConfidence
       data = data.filter((item) => {
         return item?.logprobs.reduce((acc, item) => {
@@ -202,13 +202,17 @@ const EvalVisualizerSingle = ({
       <div className="flex">
         <div id="options">
           <h3>Eval Name</h3>
-          <input type="text" list="run-names" onKeyDown={
-            (ev) => {
-              if (ev.key === "Enter") {
-                setDataset(ev.target.value);
+          <input
+            type="text"
+            list="run-names"
+            onKeyDown={
+              (ev) => {
+                if (ev.key === "Enter") {
+                  setDataset(ev.target.value);
+                }
               }
-            }
-          }></input>
+            }>
+            </input>
           <datalist id="run-names">
             {availableFiles.map((file) => {
               return (
@@ -260,7 +264,7 @@ const EvalVisualizerSingle = ({
       <div id="charts">
         {categories.map((category) => {
           return (
-            <>
+            <div key={category}>
               <h4>{category} ({
                 100*(data.filter((item) => item.query_category == category).reduce(
                   (acc, item) => {
@@ -300,7 +304,7 @@ const EvalVisualizerSingle = ({
                   );
                 })}
               </div>
-            </>
+            </div>
           );})}
       </div>
       <div
@@ -331,11 +335,17 @@ const EvalVisualizerSingle = ({
           Question: <i>{selectedItem?.question}</i>
         </p>
         <p>Database: <b>{selectedItem?.db_name}</b></p>
-        {selectedItem?.instructions ? <p>Instructions: <pre>{selectedItem.instructions}</pre></p> : null}
+        {selectedItem?.instructions ? (
+          <div>
+            <p>Instructions:</p>
+            <pre>{selectedItem.instructions}</pre>
+          </div>
+        ) : null}
         
         <div>
           {/* copy to clipboard button */}
-          <p>Golden Query: <pre>{formatSql(selectedItem?.query)}</pre></p>
+          <p>Golden Query:</p>
+          <pre>{formatSql(selectedItem?.query)}</pre>
           <button
             onClick={() => {
               navigator.clipboard.writeText(selectedItem?.query);

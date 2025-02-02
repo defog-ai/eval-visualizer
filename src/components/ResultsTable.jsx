@@ -22,7 +22,7 @@ const ResultsTable = ({ results }) => {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}> {/* Increased font size slightly */}
         <thead>
           <tr style={{ backgroundColor: "#f1f1f1", textAlign: "left" }}>
-            {Object.keys(results[0]).map((key) => (
+            {results.length > 0 && Object.keys(results[0]).map((key) => (
               <th
                 key={key}
                 style={{
