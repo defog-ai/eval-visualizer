@@ -37,7 +37,7 @@ const ResultsTable = ({ results }) => {
           </tr>
         </thead>
         <tbody>
-          {results.map((row, rowIndex) => (
+          {results && results.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {Object.values(row).map((value, colIndex) => (
                 <td

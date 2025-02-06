@@ -188,7 +188,7 @@ const EvalVisualizerSingle = ({
       });
   
       const result = await response.json();
-      setGoldenQueryResult(result.result);
+      setGoldenQueryResult(result?.result);
       setResultsSource("postgresgolden");
       setErrorMessage(prev => ({ ...prev, golden: null }));
     } catch (error) {
